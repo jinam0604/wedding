@@ -36,7 +36,7 @@ const CONFIG = {
   wedding: {
     date: "2026-06-21",
     time: "12:30",
-    venue: "메리빌리아 더 프레스티지 컨벤션 홀",
+    venue: "메리빌리아 더 프레스티지 컨벤션홀",
     address: "수원시 권선구 세화로 116",
     mapLinks: {
       kakao: "https://kko.to/FeK38Q3r1b",
@@ -56,17 +56,17 @@ const CONFIG = {
   // ── 마음 전하실 곳 ──
   accounts: {
     groom: [
-      { role: "신랑", name: "남지훈", bank: "국민은행", number: "205502-04-598759" }
+      { role: "신랑", name: "남지훈", bank: "국민은행", number: "205502-04-598759" },
         ],
     bride: [
-      { role: "신부", name: "안경진", bank: "국민은행", number: "697201-00-080302" },      
-      { role: "아버지", name: "안승출", bank: "농협은행", number: "352-1756-2004-13" }
+      { role: "신부", name: "안경진", bank: "국민은행", number: "697201-00-080302" },
+      { role: "아버지", name: "안승출", bank: "농협은행", number: "352-1756-2004-13" },      
     ]
   },
 
   // ── 링크 공유 시 나타나는 문구 ──
   meta: {
     title: "신랑 ♥ 신부 결혼합니다",
-    description: "2026년 6월 21일, 소중한 분들을 초대합니다."
+    description: "2026년 6월 21일
   }
 };
