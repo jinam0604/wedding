@@ -19,8 +19,9 @@ const CONFIG = {
   // ── 메인 (히어로) ──
   groom: {
     name: "남지훈",
+    father: "",
     mother: "이병숙",
-    fatherDeceased: false,
+    fatherDeceased: True,
     motherDeceased: false
   },
 
@@ -59,7 +60,7 @@ const CONFIG = {
         ],
     bride: [
       { role: "신부", name: "안경진", bank: "국민은행", number: "697201-00-080302" },      
-      { role: "아버지", name: "안승출", bank: "", number: "000-000-000000" }
+      { role: "아버지", name: "안승출", bank: "농협은행", number: "352-1756-2004-13" }
     ]
   },
 
