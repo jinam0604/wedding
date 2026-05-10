@@ -21,7 +21,7 @@ const CONFIG = {
     name: "남지훈",
     father: "",
     mother: "이병숙",
-    fatherDeceased: true,
+    fatherDeceased: false,
     motherDeceased: false
   },
 
@@ -37,6 +37,7 @@ const CONFIG = {
     date: "2026-06-21",
     time: "12:30",
     venue: "메리빌리아 더 프레스티지 컨벤션홀",
+    hall: "컨벤션 홀",
     address: "수원시 권선구 세화로 116",
     mapLinks: {
       kakao: "https://kko.to/FeK38Q3r1b",
