@@ -21,7 +21,7 @@ const CONFIG = {
     name: "남지훈",
     father: "",
     mother: "이병숙",
-    fatherDeceased: True,
+    fatherDeceased: true,
     motherDeceased: false
   },
 
