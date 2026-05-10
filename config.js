@@ -67,6 +67,6 @@ const CONFIG = {
   // ── 링크 공유 시 나타나는 문구 ──
   meta: {
     title: "신랑 ♥ 신부 결혼합니다",
-    description: "2026년 6월 21일
+    description: "2026년 6월 21일"
   }
 };
