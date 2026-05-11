@@ -643,6 +643,7 @@
     initHero();
     initCountdown();
     initCalendar();
+    initMusic();
 
     // Show loading placeholders while detecting images
     showLoadingPlaceholders();
@@ -673,19 +674,21 @@
   } else {
     init();
   }
-})();
-// 음악 설정 가져오기 (CONFIG가 전역 변수로 선언되어 있어야 함)
-const musicConfig = CONFIG.music;
-const player = document.getElementById('bgm-player');
-
-if (musicConfig && musicConfig.useMusic) {
-    // 화면 첫 터치/클릭 시 재생
-    const startMusic = () => {
-        player.play().catch(e => console.log("자동 재생 방지로 인해 클릭 후 재생됩니다."));
+/* ═══════════════════════════════════════════
+     Music Player (추가)
+     ═══════════════════════════════════════════ */
+  function initMusic() {
+    const player = document.getElementById('bgm-player');
+    // CONFIG.music 설정이 있는지 확인 후 실행
+    if (player && CONFIG.music && CONFIG.music.useMusic) {
+      const startMusic = () => {
+        player.play().catch(e => console.log("상호작용 후 재생 가능"));
         window.removeEventListener('click', startMusic);
         window.removeEventListener('touchstart', startMusic);
-    };
+      };
 
-    window.addEventListener('click', startMusic);
-    window.addEventListener('touchstart', startMusic);
-}
+      // 사용자가 화면을 클릭하거나 터치하는 순간 재생 시작
+      window.addEventListener('click', startMusic);
+      window.addEventListener('touchstart', startMusic);
+    }
+  }
