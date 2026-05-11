@@ -154,17 +154,24 @@
       </div>
     </section>
 
-    <!-- ─── 푸터 ─── -->
+<!-- ─── 푸터 ─── -->
     <footer class="footer">
       <p class="footer-text" id="footerText"></p>
     </footer>
 
   </main>
 
-  <script src="script.js"></script>
-  <audio id="bgm-player" loop preload="auto">
+  <!-- 배경음악 컨트롤 (자바스크립트 ID와 일치시킴) -->
+  <audio id="bgMusic" loop preload="auto">
     <source src="images/bgm.mp3" type="audio/mpeg">
   </audio>
+
+  <!-- 음악 재생 버튼 (스크립트가 찾는 버튼) -->
+  <button id="musicButton" class="music-btn" style="position:fixed; bottom:20px; right:20px; z-index:999; background:rgba(255,255,255,0.8); border:1px solid #ddd; padding:10px; border-radius:50%;">
+    🎵
+  </button>
+
+  <!-- 스크립트는 한 번만 호출 -->
   <script src="script.js"></script>
 </body>
 </html>
