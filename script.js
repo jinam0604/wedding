@@ -636,7 +636,23 @@
   /* ═══════════════════════════════════════════
      Init
      ═══════════════════════════════════════════ */
-
+  
+/* ═══════════════════════════════════════════
+    Music Player (위치 중요: init 함수보다 위에 있어야 함)
+   ═══════════════════════════════════════════ */
+function initMusic() {
+  const player = document.getElementById('bgm-player');
+  if (player && CONFIG.music && CONFIG.music.useMusic) {
+    const startMusic = () => {
+      player.play().catch(e => console.log("터치 후 재생"));
+      window.removeEventListener('click', startMusic);
+      window.removeEventListener('touchstart', startMusic);
+    };
+    window.addEventListener('click', startMusic);
+    window.addEventListener('touchstart', startMusic);
+  }
+}
+  
   async function init() {
     setMetaTags();
     initCurtain();
@@ -674,23 +690,5 @@
   } else {
     init();
   }
-/* ═══════════════════════════════════════════
-     Music Player (추가)
-     ═══════════════════════════════════════════ */
-  function initMusic() {
-    const player = document.getElementById('bgm-player');
-    // CONFIG.music 설정이 있는지 확인 후 실행
-    if (player && CONFIG.music && CONFIG.music.useMusic) {
-      const startMusic = () => {
-        player.play().catch(e => console.log("상호작용 후 재생 가능"));
-        window.removeEventListener('click', startMusic);
-        window.removeEventListener('touchstart', startMusic);
-      };
-
-      // 사용자가 화면을 클릭하거나 터치하는 순간 재생 시작
-      window.addEventListener('click', startMusic);
-      window.addEventListener('touchstart', startMusic);
-    }
-  }
-  })();
+})();
 
