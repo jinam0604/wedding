@@ -161,17 +161,15 @@
 
   </main>
 
-  <!-- 배경음악 컨트롤 (자바스크립트 ID와 일치시킴) -->
+<!-- 배경음악: ID를 반드시 'bgMusic'으로 -->
   <audio id="bgMusic" loop preload="auto">
     <source src="images/bgm.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- 음악 재생 버튼 (스크립트가 찾는 버튼) -->
-  <button id="musicButton" class="music-btn" style="position:fixed; bottom:20px; right:20px; z-index:999; background:rgba(255,255,255,0.8); border:1px solid #ddd; padding:10px; border-radius:50%;">
-    🎵
-  </button>
+  <!-- 버튼: ID를 반드시 'musicButton'으로 -->
+  <button id="musicButton" style="position:fixed; bottom:20px; right:20px; z-index:999;">🎵</button>
 
-  <!-- 스크립트는 한 번만 호출 -->
+  <!-- 스크립트 호출은 딱 한 번만 -->
   <script src="script.js"></script>
 </body>
 </html>
