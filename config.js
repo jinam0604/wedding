@@ -71,3 +71,11 @@ const CONFIG = {
     description: "2026년 6월 21일, 소중한 분들을 초대합니다."
   }
 };
+
+// ── 배경 음악 설정 추가 ──
+  music: {
+    useMusic: true, // 음악 사용 여부
+    autoPlay: true, // 첫 터치 시 자동 재생 여부
+    source: "images/bgm.mp3" // 음악 파일 경로 (방금 만든 파일 이름으로 수정)
+  }
+};
