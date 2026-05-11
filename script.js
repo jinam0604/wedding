@@ -674,3 +674,18 @@
     init();
   }
 })();
+// 음악 설정 가져오기 (CONFIG가 전역 변수로 선언되어 있어야 함)
+const musicConfig = CONFIG.music;
+const player = document.getElementById('bgm-player');
+
+if (musicConfig && musicConfig.useMusic) {
+    // 화면 첫 터치/클릭 시 재생
+    const startMusic = () => {
+        player.play().catch(e => console.log("자동 재생 방지로 인해 클릭 후 재생됩니다."));
+        window.removeEventListener('click', startMusic);
+        window.removeEventListener('touchstart', startMusic);
+    };
+
+    window.addEventListener('click', startMusic);
+    window.addEventListener('touchstart', startMusic);
+}
