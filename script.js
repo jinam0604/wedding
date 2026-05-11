@@ -692,3 +692,5 @@
       window.addEventListener('touchstart', startMusic);
     }
   }
+  })();
+
