@@ -1,3 +1,9 @@
+/**
+ * Original Warm Wedding Invitation
+ * Korean Mobile 청첩장 - Script
+ * (Original aiWedding-main design, new architecture)
+ */
+
 (function () {
   'use strict';
 
@@ -63,13 +69,38 @@
   }
 
   /* ═══════════════════════════════════════════
+      Background Music (BGM) 추가
+      ═══════════════════════════════════════════ */
+
+  function initBGM() {
+    // 오디오 객체 생성
+    const bgm = new Audio('images/bgm.mp3');
+    bgm.loop = true;
+    bgm.volume = 0.5; // 볼륨 50%
+
+    // 모바일/브라우저 정책상 첫 터치(클릭) 시 재생 시작
+    const startBGM = () => {
+      bgm.play().then(() => {
+        // 재생 성공 시 이벤트 리스너 제거
+        window.removeEventListener('click', startBGM);
+        window.removeEventListener('touchstart', startBGM);
+      }).catch(err => {
+        console.log("BGM Playback waiting for interaction");
+      });
+    };
+
+    window.addEventListener('click', startBGM);
+    window.addEventListener('touchstart', startBGM);
+  }
+
+  /* ═══════════════════════════════════════════
       Toast
       ═══════════════════════════════════════════ */
 
   let toastTimer = null;
   function showToast(message) {
     const el = $('#toast');
-    if (!el) return;
+    if (!el) return; // toast 요소가 없을 경우 대비
     el.textContent = message;
     el.classList.add('is-visible');
     clearTimeout(toastTimer);
@@ -202,6 +233,7 @@
     $('#heroNames').textContent = `${CONFIG.groom.name} & ${CONFIG.bride.name}`;
     $('#heroVenue').textContent = CONFIG.wedding.venue;
 
+    // Parents info
     const g = CONFIG.groom;
     const b = CONFIG.bride;
 
@@ -213,9 +245,9 @@
       <p class="parent-line">${parentSpan(g.father, g.fatherDeceased)} · ${parentSpan(g.mother, g.motherDeceased)}의 아들 <span class="child-name">${g.name}</span></p>
       <p class="parent-line">${parentSpan(b.father, b.fatherDeceased)} · ${parentSpan(b.mother, b.motherDeceased)}의 딸 <span class="child-name">${b.name}</span></p>
     `;
-    const heroParentsEl = $('#heroParents');
-    if (heroParentsEl) heroParentsEl.innerHTML = parentsHTML;
+    $('#heroParents').innerHTML = parentsHTML;
 
+    // Fix mobile viewport height
     const heroContainer = $('.hero-image-container');
     if (heroContainer) {
       const setFixedHeight = () => {
@@ -240,11 +272,11 @@
       const now = new Date();
       const diff = target - now;
 
-      const dEl = $('#countdown-days'), hEl = $('#countdown-hours'), mEl = $('#countdown-minutes'), sEl = $('#countdown-seconds');
-      if (!dEl || !hEl || !mEl || !sEl) return;
-
       if (diff <= 0) {
-        dEl.textContent = '0'; hEl.textContent = '0'; mEl.textContent = '0'; sEl.textContent = '0';
+        $('#countdown-days').textContent = '0';
+        $('#countdown-hours').textContent = '0';
+        $('#countdown-minutes').textContent = '0';
+        $('#countdown-seconds').textContent = '0';
         return;
       }
 
@@ -253,7 +285,10 @@
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-      dEl.textContent = days; hEl.textContent = hours; mEl.textContent = minutes; sEl.textContent = seconds;
+      $('#countdown-days').textContent = days;
+      $('#countdown-hours').textContent = hours;
+      $('#countdown-minutes').textContent = minutes;
+      $('#countdown-seconds').textContent = seconds;
     }
 
     update();
@@ -304,45 +339,25 @@
   }
 
   /* ═══════════════════════════════════════════
-      Music (새로 추가됨)
-      ═══════════════════════════════════════════ */
-
-  function initMusic() {
-    const audio = $('#bgMusic');
-    const playBtn = $('#musicButton');
-    
-    // 오디오나 버튼 중 하나라도 없으면 그냥 조용히 넘어갑니다.
-    if (!audio || !playBtn) return;
-
-    playBtn.addEventListener('click', () => {
-      if (audio.paused) {
-        audio.play().catch(e => console.warn("자동 재생이 차단되었습니다."));
-        playBtn.classList.add('playing');
-      } else {
-        audio.pause();
-        playBtn.classList.remove('playing');
-      }
-    });
-  }
-
-  /* ═══════════════════════════════════════════
       Story Section
       ═══════════════════════════════════════════ */
 
   function initStory(storyImages) {
-    const titleEl = $('#storyTitle'), contentEl = $('#storyContent');
-    if (titleEl) titleEl.textContent = CONFIG.story.title;
-    if (contentEl) contentEl.textContent = CONFIG.story.content;
+    $('#storyTitle').textContent = CONFIG.story.title;
+    $('#storyContent').textContent = CONFIG.story.content;
 
     const topContainer = $('#storyPhotos');
     const bottomContainer = $('#storyPhotosBottom');
-    if (!topContainer || !bottomContainer) return;
 
-    $$('.loading-placeholder', topContainer).forEach(p => p.remove());
-    $$('.loading-placeholder', bottomContainer).forEach(p => p.remove());
+    // Remove loading placeholder
+    const placeholder = topContainer.querySelector('.loading-placeholder');
+    if (placeholder) placeholder.remove();
+    const placeholder2 = bottomContainer.querySelector('.loading-placeholder');
+    if (placeholder2) placeholder2.remove();
 
     if (storyImages.length === 0) return;
 
+    // Place first story image above text, rest below (matching original layout)
     storyImages.forEach((src, i) => {
       const div = document.createElement('div');
       div.className = 'story-image-container fade-in-left';
@@ -352,11 +367,13 @@
       if (i === 0) {
         topContainer.appendChild(div);
       } else {
+        // Alternate animation direction
         div.className = 'story-image-container ' + (i % 2 === 0 ? 'fade-in-left' : 'fade-in-right');
         bottomContainer.appendChild(div);
       }
     });
 
+    // Re-observe new elements for scroll animations
     observeNewElements();
   }
 
@@ -364,11 +381,15 @@
       Gallery Section
       ═══════════════════════════════════════════ */
 
-  function initGallery(galleryImages) {
-    const grid = $('#galleryGrid');
-    if (!grid) return;
+  let galleryImagesList = [];
 
-    $$('.loading-placeholder', grid).forEach(p => p.remove());
+  function initGallery(galleryImages) {
+    galleryImagesList = galleryImages;
+    const grid = $('#galleryGrid');
+
+    // Remove loading placeholder
+    const placeholder = grid.querySelector('.loading-placeholder');
+    if (placeholder) placeholder.remove();
 
     if (galleryImages.length === 0) {
       const section = $('#gallerySection');
@@ -386,14 +407,15 @@
       grid.appendChild(div);
     });
 
-    const totalEl = $('#totalCount');
-    if (totalEl) totalEl.textContent = galleryImages.length;
+    // Update viewer total count
+    $('#totalCount').textContent = galleryImages.length;
 
+    // Re-observe new elements for scroll animations
     observeNewElements();
   }
 
   /* ═══════════════════════════════════════════
-      Photo Viewer
+      Photo Viewer (with swipe)
       ═══════════════════════════════════════════ */
 
   let viewerImages = [];
@@ -405,34 +427,30 @@
     viewerImages = images;
     viewerIndex = index;
     showViewerImage();
-    const viewer = $('#photoViewer');
-    if (viewer) viewer.classList.add('active');
+    $('#photoViewer').classList.add('active');
     document.body.classList.add('no-scroll');
   }
 
   function closeViewer() {
-    const viewer = $('#photoViewer');
-    if (viewer) viewer.classList.remove('active');
+    $('#photoViewer').classList.remove('active');
     document.body.classList.remove('no-scroll');
     const img = $('#viewerImage');
     if (img) img.style.transform = '';
   }
 
   function showViewerImage() {
-    const img = $('#viewerImage'), loading = $('#viewerLoading'), cur = $('#currentIndex'), tot = $('#totalCountViewer');
-    if (!img || !loading) return;
-    
+    const img = $('#viewerImage');
+    const loading = $('#viewerLoading');
     loading.classList.remove('hidden');
     img.style.opacity = '0';
+
     img.src = viewerImages[viewerIndex];
-    if (cur) cur.textContent = viewerIndex + 1;
-    // 갤러리 섹션의 totalCount와 헷갈리지 않게 뷰어 전용 ID 사용 권장
-    if (tot) tot.textContent = viewerImages.length; 
+    $('#currentIndex').textContent = viewerIndex + 1;
+    $('#totalCount').textContent = viewerImages.length;
   }
 
   function navigateViewer(direction) {
     const img = $('#viewerImage');
-    if (!img) return;
     img.classList.add('fade-out');
 
     setTimeout(() => {
@@ -447,19 +465,25 @@
   }
 
   function initPhotoViewer() {
-    const viewer = $('#photoViewer'), vi = $('#viewerImage'), vl = $('#viewerLoading');
-    if (!viewer) return;
+    const viewer = $('#photoViewer');
+    const viewerImage = $('#viewerImage');
+    const viewerLoading = $('#viewerLoading');
 
-    const closeBtn = $('#viewerClose'), prevBtn = $('#viewerPrev'), nextBtn = $('#viewerNext');
-    if (closeBtn) closeBtn.addEventListener('click', closeViewer);
-    if (prevBtn) prevBtn.addEventListener('click', () => navigateViewer('prev'));
-    if (nextBtn) nextBtn.addEventListener('click', () => navigateViewer('next'));
+    $('#viewerClose').addEventListener('click', closeViewer);
+    $('#viewerPrev').addEventListener('click', () => navigateViewer('prev'));
+    $('#viewerNext').addEventListener('click', () => navigateViewer('next'));
 
-    if (vi) {
-        vi.addEventListener('load', () => { if(vl) vl.classList.add('hidden'); vi.style.opacity = '1'; });
-        vi.addEventListener('error', () => { if(vl) vl.classList.add('hidden'); vi.style.opacity = '1'; });
-    }
+    // Image load/error
+    viewerImage.addEventListener('load', () => {
+      viewerLoading.classList.add('hidden');
+      viewerImage.style.opacity = '1';
+    });
+    viewerImage.addEventListener('error', () => {
+      viewerLoading.classList.add('hidden');
+      viewerImage.style.opacity = '1';
+    });
 
+    // Keyboard navigation
     document.addEventListener('keydown', (e) => {
       if (!viewer.classList.contains('active')) return;
       if (e.key === 'Escape') closeViewer();
@@ -467,47 +491,67 @@
       if (e.key === 'ArrowRight') navigateViewer('next');
     });
 
+    // Touch swipe
+    let isSingleTouch = false;
     const content = $('#viewerContent');
-    if (content) {
-        content.addEventListener('touchstart', (e) => {
-          if (e.touches.length === 1) touchStartX = e.touches[0].clientX;
-        }, { passive: true });
 
-        content.addEventListener('touchend', (e) => {
-          touchEndX = e.changedTouches[0].clientX;
-          const diffX = touchStartX - touchEndX;
-          if (Math.abs(diffX) > 50) diffX > 0 ? navigateViewer('next') : navigateViewer('prev');
-        });
-    }
+    content.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isSingleTouch = true;
+        touchStartX = e.touches[0].clientX;
+      } else {
+        isSingleTouch = false;
+      }
+    }, { passive: true });
+
+    content.addEventListener('touchend', (e) => {
+      if (!isSingleTouch) return;
+      touchEndX = e.changedTouches[0].clientX;
+      const diffX = touchStartX - touchEndX;
+      const swipeThreshold = 50;
+
+      if (Math.abs(diffX) > swipeThreshold) {
+        if (diffX > 0) {
+          navigateViewer('next');
+        } else {
+          navigateViewer('prev');
+        }
+      }
+    });
   }
 
   /* ═══════════════════════════════════════════
-      Location & Accounts & Footer
+      Location Section
       ═══════════════════════════════════════════ */
 
   function initLocation() {
     const w = CONFIG.wedding;
-    const vEl = $('#locationVenue'), aEl = $('#locationAddress'), mEl = $('#locationMapImg');
-    if (vEl) vEl.textContent = w.venue;
-    if (aEl) aEl.textContent = w.address;
-    if (mEl) mEl.src = 'images/location/1.jpg';
-    
-    const kBtn = $('#kakaoMapBtn'), nBtn = $('#naverMapBtn');
-    if (kBtn) kBtn.href = w.mapLinks.kakao || '#';
-    if (nBtn) nBtn.href = w.mapLinks.naver || '#';
+    $('#locationVenue').textContent = w.venue;
+    $('#locationAddress').textContent = w.address;
+    $('#locationMapImg').src = 'images/location/1.jpg';
+    $('#kakaoMapBtn').href = w.mapLinks.kakao || '#';
+    $('#naverMapBtn').href = w.mapLinks.naver || '#';
 
-    const copyBtn = $('#copyAddressBtn');
-    if (copyBtn) copyBtn.addEventListener('click', () => copyToClipboard(w.address, '주소가 복사되었습니다'));
+    $('#copyAddressBtn').addEventListener('click', () => {
+      copyToClipboard(w.address, '주소가 복사되었습니다');
+    });
   }
+
+  /* ═══════════════════════════════════════════
+      Account Section (축의금)
+      ═══════════════════════════════════════════ */
 
   function renderAccounts(accounts, containerId) {
     const container = $(`#${containerId}`);
-    if (!container) return;
     accounts.forEach((acc) => {
       const item = document.createElement('div');
       item.className = 'account-item';
       const accountStr = `${acc.bank} ${acc.number}`;
-      item.innerHTML = `<p class="account-role">${acc.role}</p><p class="account-info">${accountStr}</p><button class="copy-btn" data-account="${accountStr}">복사</button>`;
+      item.innerHTML = `
+        <p class="account-role">${acc.role}</p>
+        <p class="account-info">${accountStr}</p>
+        <button class="copy-btn" data-account="${accountStr}">복사</button>
+      `;
       container.appendChild(item);
     });
   }
@@ -515,24 +559,63 @@
   function initAccounts() {
     renderAccounts(CONFIG.accounts.groom, 'groomAccountList');
     renderAccounts(CONFIG.accounts.bride, 'brideAccountList');
-    $$('.accordion-header').forEach(h => h.addEventListener('click', () => h.parentElement.classList.toggle('active')));
+
+    // Accordion toggles
+    $$('.accordion-header').forEach((header) => {
+      header.addEventListener('click', () => {
+        const accordion = header.parentElement;
+        accordion.classList.toggle('active');
+      });
+    });
+
+    // Copy account delegates
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('.account-item .copy-btn');
-      if (btn) copyToClipboard(btn.dataset.account, '계좌번호가 복사되었습니다');
+      if (!btn) return;
+      const text = btn.dataset.account;
+      copyToClipboard(text, '계좌번호가 복사되었습니다');
     });
   }
 
+  /* ═══════════════════════════════════════════
+      Footer
+      ═══════════════════════════════════════════ */
+
   function initFooter() {
     const dt = getWeddingDateTime();
-    const fText = $('#footerText');
-    if (fText) fText.textContent = `${CONFIG.groom.name} & ${CONFIG.bride.name} — ${dt.getFullYear()}.${String(dt.getMonth() + 1).padStart(2, '0')}.${String(dt.getDate()).padStart(2, '0')}`;
+    const year = dt.getFullYear();
+    const month = String(dt.getMonth() + 1).padStart(2, '0');
+    const day = String(dt.getDate()).padStart(2, '0');
+    $('#footerText').textContent = `${CONFIG.groom.name} & ${CONFIG.bride.name} — ${year}.${month}.${day}`;
   }
 
   /* ═══════════════════════════════════════════
-      Scroll Animations
+      Loading Placeholders
       ═══════════════════════════════════════════ */
 
+  function showLoadingPlaceholders() {
+    const placeholderHTML = '<div class="loading-placeholder"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></div>';
+
+    const storyPhotos = $('#storyPhotos');
+    const galleryGrid = $('#galleryGrid');
+
+    if (storyPhotos) storyPhotos.innerHTML = placeholderHTML;
+    if (galleryGrid) galleryGrid.innerHTML = placeholderHTML;
+  }
+
+  /* ═══════════════════════════════════════════
+      Scroll Animations (IntersectionObserver)
+      ═══════════════════════════════════════════ */
+
+  let scrollObserver = null;
+
   function initScrollAnimations() {
+    const observerOptions = {
+      root: null,
+      rootMargin: '0px',
+      threshold: 0.1
+    };
+
     scrollObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
@@ -540,61 +623,76 @@
           scrollObserver.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.1 });
+    }, observerOptions);
 
-    const animTargets = ['.story-text', '.gallery-title', '.gallery-subtitle', '.location-title', '.location-info', '.location-map-container', '.account-title', '.account-subtitle'];
-    animTargets.forEach(sel => {
-        const el = $(sel);
-        if (el) el.classList.add(sel.includes('story') ? 'fade-in-right' : (sel.includes('map') ? 'scale-in' : 'fade-in'));
+    // Add animation classes to static elements
+    const storyText = $('.story-text');
+    const galleryTitle = $('.gallery-title');
+    const gallerySubtitle = $('.gallery-subtitle');
+    const locationTitle = $('.location-title');
+    const locationInfo = $('.location-info');
+    const locationMap = $('.location-map-container');
+    const accountTitle = $('.account-title');
+    const accountSubtitle = $('.account-subtitle');
+
+    if (storyText) storyText.classList.add('fade-in-right');
+    if (galleryTitle) galleryTitle.classList.add('fade-in');
+    if (gallerySubtitle) gallerySubtitle.classList.add('fade-in');
+    if (locationTitle) locationTitle.classList.add('fade-in');
+    if (locationInfo) locationInfo.classList.add('fade-in');
+    if (locationMap) locationMap.classList.add('scale-in');
+    if (accountTitle) accountTitle.classList.add('fade-in');
+    if (accountSubtitle) accountSubtitle.classList.add('fade-in');
+
+    // Observe all animated elements
+    $$('.fade-in, .fade-in-left, .fade-in-right, .scale-in').forEach(el => {
+      scrollObserver.observe(el);
     });
-
-    $$('.fade-in, .fade-in-left, .fade-in-right, .scale-in').forEach(el => scrollObserver.observe(el));
   }
 
   function observeNewElements() {
     if (!scrollObserver) return;
     $$('.fade-in, .fade-in-left, .fade-in-right, .scale-in').forEach(el => {
-      if (!el.classList.contains('visible')) scrollObserver.observe(el);
+      if (!el.classList.contains('visible')) {
+        scrollObserver.observe(el);
+      }
     });
   }
 
-  function showLoadingPlaceholders() {
-    const html = '<div class="loading-placeholder"><span class="loading-dot"></span><span class="loading-dot"></span><span class="loading-dot"></span></div>';
-    const sP = $('#storyPhotos'), gG = $('#galleryGrid');
-    if (sP) sP.innerHTML = html;
-    if (gG) gG.innerHTML = html;
-  }
-
   /* ═══════════════════════════════════════════
-      실행 (Init) - 핵심 안정성 확보
+      Init
       ═══════════════════════════════════════════ */
 
   async function init() {
-    // 1. 기초 설정 (에러나도 진행)
-    try { setMetaTags(); } catch(e) {}
-    try { initCurtain(); } catch(e) {}
-    try { initHero(); } catch(e) {}
-    try { initCountdown(); } catch(e) {}
-    try { initCalendar(); } catch(e) {}
-    
-    // 2. 비이미지 섹션 초기화
+    setMetaTags();
+    initCurtain();
+    initHero();
+    initCountdown();
+    initCalendar();
+
+    // BGM 초기화 호출 추가
+    initBGM();
+
+    // Show loading placeholders while detecting images
+    showLoadingPlaceholders();
+
+    // Init sections that don't depend on image detection
     initPhotoViewer();
     initLocation();
     initAccounts();
     initFooter();
     initScrollAnimations();
-    initPetals();
-    
-    // 3. 음악 로직 (안전 장치: 버튼 없어도 사진 로직 방해 안 함)
-    try { initMusic(); } catch(e) { console.warn("Music init failed", e); }
 
-    // 4. 사진 로딩 (가장 중요)
-    showLoadingPlaceholders();
+    // Start petal animation
+    initPetals();
+
+    // Auto-detect story and gallery images in parallel
     const [storyImages, galleryImages] = await Promise.all([
       loadImagesFromFolder('story'),
       loadImagesFromFolder('gallery')
     ]);
 
+    // Render sections with discovered images
     initStory(storyImages);
     initGallery(galleryImages);
   }
